@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/github_prs.json",
+  "title": "GitHub Pull Requests",
+  "description": "Schema for either an array of pull requests (as stored in the JSON files) or a single pull request object.",
+  "anyOf": [
+    {
+      "title": "Pull Request Array",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/pull_request"
+      }
+    },
+    {
+      "$ref": "#/definitions/pull_request"
+    }
+  ],
+  "definitions": {
+    "pull_request": {
+      "title": "Pull Request",
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "user_login": {
+          "type": "string"
+        },
+        "merged_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "reviews": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string"
+              }
+            },
+            "required": ["state"]
+          }
+        },
+        "status_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "conclusion": {
+                "type": "string"
+              }
+            },
+            "required": ["conclusion"]
+          }
+        }
+      },
+      "required": ["number", "title", "user_login"],
+      "additionalProperties": true
+    }
+  }
+}

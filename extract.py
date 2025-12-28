@@ -49,9 +49,9 @@ class GitHubExtractor:
             try:
                 response = self.session.get(url, params=params)
                 
-                # --- Rate Limit Handling ---
+                # Rate Limit Handling 
                 if response.status_code in [403, 429]:
-                    # Check if it's a rate limit issue
+                    # Check if rate limit issue
                     remaining = int(response.headers.get("X-RateLimit-Remaining", 1))
                     if remaining == 0:
                         reset_timestamp = int(response.headers.get("X-RateLimit-Reset", 0))
@@ -87,7 +87,7 @@ class GitHubExtractor:
                 break 
             
             for item in data:
-                # [cite_start]--- Extract Metadata [cite: 19-26] ---
+                # Extract Metadata
                 pr_meta = {
                     "number": item.get("number"),
                     "title": item.get("title"),
@@ -110,12 +110,12 @@ class GitHubExtractor:
 
     def fetch_pr_details(self, pr: Dict) -> Dict:
         """
-        [cite_start]Enriches a PR with Reviews, Status Checks, and Commits [cite: 27-39].
+        Enriches a PR with Reviews, Status, and Commits.
         """
         pr_num = pr["number"]
         head_sha = pr["head_sha"]
 
-        # [cite_start]--- 1. Review Information [cite: 27-31] ---
+        # Review Information
         reviews_data = self._make_request(f"pulls/{pr_num}/reviews")
         reviews = []
         approved_count = 0
@@ -127,7 +127,6 @@ class GitHubExtractor:
                 if state == "APPROVED":
                     approved_count += 1
 
-        # [cite_start]--- 2. Status Checks [cite: 32-35] ---
         # Assignment asks for "Combined status" (commits/{ref}/status)
         status_data = self._make_request(f"commits/{head_sha}/status")
         statuses = []
@@ -140,7 +139,7 @@ class GitHubExtractor:
                     "completed_at": s.get("updated_at")
                 })
 
-        # [cite_start]--- 3. Associated Commits [cite: 36-39] ---
+        # Associated Commits
         commits_data = self._make_request(f"pulls/{pr_num}/commits")
         commits_info = []
         
@@ -151,7 +150,7 @@ class GitHubExtractor:
                     "author_name": c.get("commit", {}).get("author", {}).get("name")
                 })
 
-        # --- Assemble Final Data Structure ---
+        #  Assemble Data Structure
         pr["reviews"] = reviews
         pr["approved_review_count"] = approved_count
         pr["status_checks"] = statuses
@@ -161,12 +160,12 @@ class GitHubExtractor:
         return pr
 
     def run(self):
-        # 1. Fetch Metadata
+        # Fetch Metadata
         raw_prs = self.fetch_pr_metadata(limit=LIMIT_PRS)
         
         enriched_data = []
         
-        # 2. Enrich Data (Concurrent)
+        # Enrich Data
         # Increased workers to 5 since we have a token
         logger.info(f"Starting concurrent enrichment for {len(raw_prs)} PRs...")
         with ThreadPoolExecutor(max_workers=5) as executor:
