@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator  # ty:ignore[unresolved-import]
+from airflow.providers.standard.operators.python import PythonOperator
 import pendulum  # ty:ignore[unresolved-import]
 from datetime import timedelta
 import sys
