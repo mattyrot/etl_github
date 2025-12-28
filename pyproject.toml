@@ -1,7 +1,7 @@
 [project]
 name = "etl-github"
 version = "0.1.0"
-description = "Extrance "
+description = "Extract, Transform and Load from github api to duckdb"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
