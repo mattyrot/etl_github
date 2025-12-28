@@ -1,6 +1,6 @@
 from airflow import DAG
-from airflow.operators.python import PythonOperator
-from airflow.utils.dates import days_ago
+from airflow.operators.python import PythonOperator  # ty:ignore[unresolved-import]
+from airflow.utils.dates import days_ago  # ty:ignore[unresolved-import]
 from datetime import timedelta
 import sys
 import os
