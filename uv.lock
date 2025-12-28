@@ -768,6 +768,7 @@ dependencies = [
     { name = "black" },
     { name = "duckdb" },
     { name = "jsonschema" },
+    { name = "pendulum" },
     { name = "polars" },
     { name = "requests" },
 ]
@@ -778,6 +779,7 @@ requires-dist = [
     { name = "black", specifier = ">=25.12.0" },
     { name = "duckdb", specifier = ">=1.4.3" },
     { name = "jsonschema", specifier = ">=4.25.1" },
+    { name = "pendulum", specifier = ">=3.1.0" },
     { name = "polars", specifier = ">=1.36.1" },
     { name = "requests", specifier = ">=2.32.5" },
 ]
