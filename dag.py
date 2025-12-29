@@ -1,21 +1,19 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta, timezone
-from extract import GitHubExtractor, REPO_OWNER, REPO_NAME, GITHUB_TOKEN
-from transform import run_transform
-from load import run_load
 
 import sys
 import os
-import logging
 
 # This is crucial for Docker environments
 DAGS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, DAGS_FOLDER)
 
+from extract import GitHubExtractor, REPO_OWNER, REPO_NAME, GITHUB_TOKEN
+from transform import run_transform
+from load import run_load
 
-
-# 3. Define Default Args
+# Define Default Args
 default_args = {
     'owner': 'scytale_candidate',
     'depends_on_past': False,
@@ -24,7 +22,7 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-# 4. Define the DAG
+# Define the DAG
 with DAG(
     'scytale_compliance_etl',
     default_args=default_args,
