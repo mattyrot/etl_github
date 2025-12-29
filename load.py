@@ -1,7 +1,8 @@
+import logging
 import os
 import shutil
-import logging
 from datetime import datetime
+
 import duckdb
 
 # --- Configuration ---
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SHARED_DATA_DIR = os.path.join(BASE_DIR, "data")
 DB_FILE = os.path.join(SHARED_DATA_DIR, "scytale.duckdb")
+
 
 def run_load(input_file: str):
     """
@@ -38,15 +40,33 @@ def run_load(input_file: str):
     # Load into DuckDB ---
     logger.info(f"Loading data into DuckDB: {DB_FILE}...")
 
-    # Fix path for SQL (DuckDB prefers forward slashes even on Windows/WSL)
+    # DuckDB prefers forward slashes
     input_path_sql = input_file.replace("\\", "/")
 
     try:
         con = duckdb.connect(DB_FILE)
 
-        # Create the table
-        create_query = f"CREATE OR REPLACE TABLE compliance_data AS SELECT * FROM '{input_path_sql}'"
-        con.execute(create_query)
+        # Check if table exists
+        table_exists = (
+            con.execute(
+                """
+            SELECT 1
+            FROM information_schema.tables
+            WHERE table_schema = 'main'
+              AND table_name = 'compliance_data'
+            """
+            ).fetchone()
+            is not None
+        )
+
+        if not table_exists:
+            # Create the table on first load
+            create_query = f"CREATE TABLE compliance_data AS SELECT * FROM '{input_path_sql}'"
+            con.execute(create_query)
+        else:
+            # Append to existing data so it is not overwritten
+            insert_query = f"INSERT INTO compliance_data SELECT * FROM '{input_path_sql}'"
+            con.execute(insert_query)
 
         # We check if the result is None before trying to access
         res = con.execute("SELECT COUNT(*) FROM compliance_data").fetchone()
@@ -63,13 +83,14 @@ def run_load(input_file: str):
         try:
             logger.info(con.execute("SELECT * FROM compliance_data LIMIT 10").pl())
         except Exception:
-             logger.info(con.execute("SELECT * FROM compliance_data LIMIT 10").fetchall())
+            logger.info(con.execute("SELECT * FROM compliance_data LIMIT 10").fetchall())
 
         con.close()
 
     except Exception as e:
         logger.error(f"Database Error: {e}")
-        raise # Raise so Airflow marks the task as failed
+        raise  # Raise so Airflow marks the task as failed
+
 
 if __name__ == "__main__":
     # Fallback for manual running (defaults to expected location)

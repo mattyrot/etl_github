@@ -154,7 +154,7 @@ class GitHubExtractor:
                 if (i + 1) % 10 == 0:
                     logger.info(f"Enriched {i + 1}/{len(raw_prs)} PRs...")
 
-            # 3. Save to Local JSON using Absolute Path
+            # Save to Local JSON using Absolute Path
             abs_output_dir = os.path.abspath(self.output_dir)
             if not os.path.exists(abs_output_dir):
                 os.makedirs(abs_output_dir)
