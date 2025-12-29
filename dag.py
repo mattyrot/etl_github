@@ -35,10 +35,12 @@ with DAG(
 ) as dag:
 
     #  Task 1: Extract 
-    def execute_extract():
-        # Initialize the class using variables imported from extract.py
+    def execute_extract(**context):
         extractor = GitHubExtractor(GITHUB_TOKEN, REPO_OWNER, REPO_NAME)
-        asyncio.run(extractor.run())
+        # We capture the return value (the filename)
+        file_path = asyncio.run(extractor.run())
+        # Returning it here pushes it to XCom automatically
+        return file_path
 
     extract_task = PythonOperator(
         task_id='extract_task',
