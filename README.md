@@ -48,9 +48,6 @@ docker compose up -d
 Passing the GitHub token (build time)
 - The token is passed to the Docker build as a build-arg.
 
-Run Airflow with docker compose
-- From the project root, after the image is built:
-	- `docker compose up -d`
 
 Access the UI
 - Open http://localhost:8080 in your browser.
