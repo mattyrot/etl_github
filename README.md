@@ -45,9 +45,8 @@ docker build \
 docker compose up -d
 ```
 
-Passing the GitHub token (build time)
-- The token is passed to the Docker build as a build-arg.
-
+The token can also be set later using the Airflow UI at:
+- http://localhost:8080/variable/list/
 
 Access the UI
 - Open http://localhost:8080 in your browser.
