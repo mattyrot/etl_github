@@ -4,6 +4,6 @@ build/
 dist/
 wheels/
 *.egg-info
-uv.lock
+# uv.lock
 requirements.txt
 
