@@ -9,7 +9,10 @@ from datetime import datetime
 
 # --- Configuration ---
 # Hardcoded token as requested (Best practice: use os.getenv("GITHUB_TOKEN"))
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+if not GITHUB_TOKEN:
+    raise ValueError("Error: GITHUB_TOKEN environment variable is missing. Check your docker-compose.yml")
 
 REPO_OWNER = "home-assistant"
 REPO_NAME = "core"
