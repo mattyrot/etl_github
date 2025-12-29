@@ -1,5 +1,8 @@
 FROM apache/airflow:slim-2.11.0-python3.10
 
+ARG AIRFLOW_VAR_GITHUB_TOKEN
+ENV AIRFLOW_VAR_GITHUB_TOKEN=${AIRFLOW_VAR_GITHUB_TOKEN}
+
 USER root
 
 WORKDIR /opt/airflow/dags/etl_github
