@@ -31,8 +31,7 @@ def load_and_validate_file(file_path: str) -> list:
         try:
             data = json.load(f)
             
-            # --- KEEPING YOUR OLD SCHEMA LOGIC ---
-            # Validates the entire JSON object (expected to be a list) against the schema
+            # Validates the entire JSON object against the schema
             validate(instance=data, schema=INPUT_SCHEMA)
             
             return data
@@ -49,7 +48,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
     """
     Transforms the specific input file and returns the path to the output Parquet file.
     """
-    # 1. Load Data (Single File)
+    # Load Data 
     raw_data = load_and_validate_file(input_path)
     
     if not raw_data:
@@ -58,7 +57,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
     # Polars automatically infers nested structures (Lists/Structs)
     df = pl.DataFrame(raw_data)
 
-    # 2. Apply Compliance Logic
+    # Apply Compliance Logic
     transformed_df = df.select(
         [
             pl.col("number").alias("pr_number"),
@@ -85,7 +84,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
         (pl.col("code_review_passed") & pl.col("status_checks_passed")).alias("is_compliant")
     )
 
-    # 3. Summary Statistics
+    # Summary Statistics
     total_prs = transformed_df.height
     compliant_prs = transformed_df.filter(pl.col("is_compliant")).height
     compliance_rate = (compliant_prs / total_prs * 100) if total_prs > 0 else 0.0
@@ -98,7 +97,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
     logger.info(f"Compliance Rate:    {compliance_rate:.2f}%")
     logger.info("-" * 30)
 
-    # Violations by Repository (Logged)
+    # Violations by Repository
     violations = (
         transformed_df.filter(~pl.col("is_compliant"))
         .group_by("repository")
@@ -106,7 +105,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
     )
     logger.info(f"Violations:\n{violations}")
 
-    # 4. Save Output
+    # Save Output
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -118,7 +117,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
     transformed_df.write_parquet(parquet_path)
     logger.info(f"Transformed data saved to: {parquet_path}")
 
-    # Optional: Save as CSV
+    # Optional - Save as CSV
     csv_path = os.path.join(output_dir, f"transformed_{base_name}.csv")
     transformed_df.write_csv(csv_path)
 
@@ -132,4 +131,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         run_transform(sys.argv[1])
     else:
-        print("Usage: python transform.py <path_to_json_file>")
+        print("Usage: python transform.py path_to_json_file")
