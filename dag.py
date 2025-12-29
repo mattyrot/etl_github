@@ -1,6 +1,9 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta, timezone
+from extract import GitHubExtractor, REPO_OWNER, REPO_NAME, GITHUB_TOKEN
+from transform import run_transform
+from load import run_load
 
 import sys
 import os
@@ -10,12 +13,7 @@ import logging
 DAGS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, DAGS_FOLDER)
 
-try:
-    from extract import GitHubExtractor, REPO_OWNER, REPO_NAME, GITHUB_TOKEN
-    from transform import run_transform
-    from load import run_load
-except ImportError as e:
-    logging.error(f"Could not import ETL scripts. Check filenames! Error: {e}")
+
 
 # 3. Define Default Args
 default_args = {
