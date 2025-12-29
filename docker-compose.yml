@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  airflow:
+    build: .
+    image: scytale-airflow-fixed  
+    user: "50000:0"                  
+    container_name: scytale_airflow
+    environment:
+    - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/opt/airflow/data
+      - ./logs:/opt/airflow/logs
+
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create --username scytale --password scytale --role Admin -e scytale@scytale.com -f scytale -l scytale  &&
+      airflow standalone"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      retries: 3
+
+
