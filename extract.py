@@ -4,10 +4,12 @@ import asyncio
 import logging
 import httpx
 from typing import List, Dict, Any, Optional
+from airflow.models import Variable
 from datetime import datetime
 
 # --- Configuration ---
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_TOKEN = Variable.get("GITHUB_TOKEN", default_var=None)
 REPO_OWNER = "home-assistant"
 REPO_NAME = "core"
 OUTPUT_DIR = "data"

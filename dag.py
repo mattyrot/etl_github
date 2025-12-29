@@ -45,6 +45,7 @@ with DAG(
     extract_task = PythonOperator(
         task_id='extract_task',
         python_callable=execute_extract,
+        provide_context=True,
         doc_md="Fetches PR metadata, reviews, and status checks."
     )
 
@@ -66,6 +67,7 @@ with DAG(
     transform_task = PythonOperator(
         task_id='transform_task',
         python_callable=execute_transform,
+        provide_context=True,
         doc_md="Validates schema and checks compliance rules."
     )
 
@@ -81,6 +83,7 @@ with DAG(
     load_task = PythonOperator(
         task_id='load_task',
         python_callable=execute_load,
+        provide_context=True,
         doc_md="Loads data into DuckDB and archives Parquet."
     )
 
