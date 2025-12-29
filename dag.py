@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.providers.standard.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator
 import pendulum  # ty:ignore[unresolved-import]
 from datetime import timedelta
 import sys
@@ -31,7 +31,7 @@ with DAG(
     'scytale_compliance_etl',
     default_args=default_args,
     description='ETL pipeline for GitHub compliance monitoring',
-    schedule_interval='0 0 * * *',  # ty:ignore[unknown-argument]
+    schedule_interval='0 12 * * *', 
     start_date=pendulum.today('UTC').add(days=-1),
     catchup=False,
     tags={'scytale'},
