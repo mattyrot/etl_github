@@ -64,15 +64,15 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
             pl.col("title").alias("pr_title"),
             pl.col("user_login").alias("author"),
             pl.lit("home-assistant/core").alias("repository"),
-            # Added time_zone="UTC" to handle the 'Z' suffix
+            # Added time_zone="UTC" to handle the Z 
             pl.col("merged_at").str.to_datetime(time_zone="UTC"),
-            # "at least one approved review"
+            # "Approved review
             pl.col("reviews")
             .list.eval(pl.element().struct.field("state") == "APPROVED")
             .list.any()
             .fill_null(False)
             .alias("code_review_passed"),
-            # "all required checks successful"
+            # "Required checks successful"
             pl.col("status_checks")
             .list.eval(pl.element().struct.field("conclusion") == "success")
             .list.all()
