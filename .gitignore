@@ -4,7 +4,5 @@ build/
 dist/
 wheels/
 *.egg-info
-# uv.lock
-# requirements.txt
 data/
-data/
+requirements.txt

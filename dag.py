@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta, timezone
-
+import asyncio
 import sys
 import os
 
@@ -9,9 +9,9 @@ import os
 DAGS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, DAGS_FOLDER)
 
-from extract import GitHubExtractor, REPO_OWNER, REPO_NAME, GITHUB_TOKEN
-from transform import run_transform
-from load import run_load
+from extract import GitHubExtractor, REPO_OWNER, REPO_NAME, GITHUB_TOKEN  # noqa: E402
+from transform import run_transform  # noqa: E402
+from load import run_load  # noqa: E402
 
 # Define Default Args
 default_args = {
@@ -38,7 +38,7 @@ with DAG(
     def execute_extract():
         # Initialize the class using variables imported from extract.py
         extractor = GitHubExtractor(GITHUB_TOKEN, REPO_OWNER, REPO_NAME)
-        extractor.run()
+        asyncio.run(extractor.run())
 
     extract_task = PythonOperator(
         task_id='extract_task',
