@@ -28,6 +28,7 @@ with DAG(
     default_args=default_args,
     description='ETL pipeline for GitHub compliance monitoring',
     # schedule_interval='0 12 * * *', 
+    schedule_interval=None, 
     start_date=datetime(2025, 12, 1, tzinfo=timezone.utc),
     catchup=False,
     tags=['scytale'],  
