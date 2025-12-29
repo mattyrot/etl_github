@@ -28,6 +28,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("GitHubExtractor")
 
+logging.getLogger("httpx").setLevel(logging.WARNING) # Otherwise cant see the enritched
+
 class GitHubExtractor:
     def __init__(self, token: str, owner: str, repo: str):
         self.base_url = f"https://api.github.com/repos/{owner}/{repo}"
