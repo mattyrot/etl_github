@@ -5,5 +5,5 @@ dist/
 wheels/
 *.egg-info
 uv.lock
-
+requirements.txt
 
