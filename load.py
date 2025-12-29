@@ -54,7 +54,7 @@ def run_load():
         # Show a sample
         print("\nSample Data:")
         # .df() converts result to a clean Pandas-style view for printing
-        print(con.execute("SELECT * FROM compliance_data LIMIT 3").df())
+        print(con.execute("SELECT * FROM compliance_data LIMIT 3").pl())
 
         con.close()
 
