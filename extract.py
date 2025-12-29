@@ -96,7 +96,6 @@ class GitHubExtractor:
         return prs
 
     async def fetch_pr_details(self, client: httpx.AsyncClient, pr: Dict) -> Dict:
-        # ... (Same logic as before) ...
         pr_num = pr["number"]
         head_sha = pr["head_sha"]
 

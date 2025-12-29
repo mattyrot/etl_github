@@ -49,8 +49,19 @@ with DAG(
     )
 
     #  Task 2: Transform 
-    def execute_transform():
-        run_transform()
+    def execute_transform(**context):
+        # GET the file path from Extract task
+        ti = context['ti']
+        input_file = ti.xcom_pull(task_ids='extract_task')
+        
+        if not input_file:
+            raise ValueError("No input file received from extract_task")
+
+        # Transform on that specific file
+        output_file = run_transform(input_path=input_file, output_dir="data")
+        
+        # return the new file path for the Load task
+        return output_file
 
     transform_task = PythonOperator(
         task_id='transform_task',
@@ -59,8 +70,13 @@ with DAG(
     )
 
     #  Task 3: Load 
-    def execute_load():
-        run_load()
+    def execute_load(**context):
+        # Get the filename passed from Transform
+        ti = context['ti']
+        transformed_file = ti.xcom_pull(task_ids='transform_task')
+        
+        # Run the load function , Nothing to return, done.
+        run_load(input_file=transformed_file)
 
     load_task = PythonOperator(
         task_id='load_task',

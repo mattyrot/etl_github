@@ -1,21 +1,25 @@
 import os
 import shutil
+import logging
 from datetime import datetime
-
 import duckdb
 
 # --- Configuration ---
-# Get absolute paths to ensure scripts work regardless of where you run them from
+# Use Airflow logger to see output in Airflow UI
+logger = logging.getLogger(__name__)
+
+# Base paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INPUT_FILE = os.path.join(BASE_DIR, "output", "compliance_report.parquet")
 SHARED_DATA_DIR = os.path.join(BASE_DIR, "data")
 DB_FILE = os.path.join(SHARED_DATA_DIR, "scytale.duckdb")
 
-
-def run_load():
+def run_load(input_file: str):
+    """
+    Loads the Parquet file into DuckDB and archives it.
+    """
     # Validation
-    if not os.path.exists(INPUT_FILE):
-        print(f"Input file not found: {INPUT_FILE}")
+    if not input_file or not os.path.exists(input_file):
+        logger.error(f"Input file not found: {input_file}")
         return
 
     # Ensure shared data directory exists
@@ -26,15 +30,16 @@ def run_load():
     dest_path = os.path.join(SHARED_DATA_DIR, f"compliance_{timestamp}.parquet")
 
     try:
-        shutil.copy(INPUT_FILE, dest_path)
-        print(f"Archived Parquet to: {dest_path}")
+        shutil.copy(input_file, dest_path)
+        logger.info(f"Archived Parquet to: {dest_path}")
     except IOError as e:
-        print(f"Failed to archive Parquet: {e}")
+        logger.error(f"Failed to archive Parquet: {e}")
 
     # Load into DuckDB ---
-    print(f"Loading data into DuckDB: {DB_FILE}...")
+    logger.info(f"Loading data into DuckDB: {DB_FILE}...")
 
-    input_path_sql = INPUT_FILE.replace("\\", "/")  # I worked on windows and ran in WSL
+    # Fix path for SQL (DuckDB prefers forward slashes even on Windows/WSL)
+    input_path_sql = input_file.replace("\\", "/")
 
     try:
         con = duckdb.connect(DB_FILE)
@@ -47,20 +52,26 @@ def run_load():
         res = con.execute("SELECT COUNT(*) FROM compliance_data").fetchone()
 
         if res is None:
-            print("Warning: Query returned no rows (unexpected for COUNT).")
+            logger.warning("Query returned no rows (unexpected for COUNT).")
         else:
-            print(f"Successfully loaded {res[0]} rows into table 'compliance_data'.")
+            logger.info(f"Successfully loaded {res[0]} rows into table 'compliance_data'.")
 
         # Show a sample
-        print("\nSample Data:")
-        # .df() converts result to a clean Pandas-style view for printing
-        print(con.execute("SELECT * FROM compliance_data LIMIT 10").pl())
+        logger.info("\nSample Data:")
+        # .pl() converts result to a clean Polars/Pandas-style view if available
+        # If running in a slim container without Polars, this might need .fetchall()
+        try:
+            logger.info(con.execute("SELECT * FROM compliance_data LIMIT 10").pl())
+        except Exception:
+             logger.info(con.execute("SELECT * FROM compliance_data LIMIT 10").fetchall())
 
         con.close()
 
     except Exception as e:
-        print(f"Database Error: {e}")
-
+        logger.error(f"Database Error: {e}")
+        raise # Raise so Airflow marks the task as failed
 
 if __name__ == "__main__":
-    run_load()
+    # Fallback for manual running (defaults to expected location)
+    default_input = os.path.join(BASE_DIR, "output", "compliance_report.parquet")
+    run_load(default_input)
