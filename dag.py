@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-import pendulum  # ty:ignore[unresolved-import]
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
+
 import sys
 import os
 import logging
@@ -32,9 +32,9 @@ with DAG(
     default_args=default_args,
     description='ETL pipeline for GitHub compliance monitoring',
     schedule_interval='0 12 * * *', 
-    start_date=pendulum.today('UTC').add(days=-1),
+    start_date=datetime(2025, 12, 1, tzinfo=timezone.utc),
     catchup=False,
-    tags={'scytale'},
+    tags=['scytale'],  
 ) as dag:
 
     #  Task 1: Extract 
