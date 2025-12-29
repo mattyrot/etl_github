@@ -6,4 +6,5 @@ wheels/
 *.egg-info
 # uv.lock
 # requirements.txt
-
+data/
+data/
