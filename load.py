@@ -37,7 +37,7 @@ def run_load(input_file: str):
     except IOError as e:
         logger.error(f"Failed to archive Parquet: {e}")
 
-    # Load into DuckDB ---
+    # Load into DuckDB
     logger.info(f"Loading data into DuckDB: {DB_FILE}...")
 
     # DuckDB prefers forward slashes
@@ -79,7 +79,6 @@ def run_load(input_file: str):
         # Show a sample
         logger.info("\nSample Data:")
         # .pl() converts result to a clean Polars/Pandas-style view if available
-        # If running in a slim container without Polars, this might need .fetchall()
         try:
             logger.info(con.execute("SELECT * FROM compliance_data LIMIT 10").pl())
         except Exception:
@@ -93,6 +92,6 @@ def run_load(input_file: str):
 
 
 if __name__ == "__main__":
-    # Fallback for manual running (defaults to expected location)
+    # Fallback for manual running and local testing
     default_input = os.path.join(BASE_DIR, "output", "compliance_report.parquet")
     run_load(default_input)

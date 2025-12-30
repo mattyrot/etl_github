@@ -27,8 +27,7 @@ with DAG(
     'scytale_compliance_etl',
     default_args=default_args,
     description='ETL pipeline for GitHub compliance monitoring',
-    # schedule_interval='0 12 * * *', 
-    schedule_interval=None, 
+    schedule_interval='0 12 * * *', 
     start_date=datetime(2025, 12, 1, tzinfo=timezone.utc),
     catchup=False,
     tags=['scytale'],  
@@ -87,5 +86,5 @@ with DAG(
         doc_md="Loads data into DuckDB and archives Parquet."
     )
 
-    # Making sure the orderis correct
+    # Making sure the order is correct
     extract_task >> transform_task >> load_task

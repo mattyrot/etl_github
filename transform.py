@@ -64,15 +64,15 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
             pl.col("title").alias("pr_title"),
             pl.col("user_login").alias("author"),
             pl.lit("home-assistant/core").alias("repository"),
-            # Added time_zone="UTC" to handle the Z 
+            # Added time_zone="UTC"
             pl.col("merged_at").str.to_datetime(time_zone="UTC"),
-            # "Approved review
+            # Approved review
             pl.col("reviews")
             .list.eval(pl.element().struct.field("state") == "APPROVED")
             .list.any()
             .fill_null(False)
             .alias("code_review_passed"),
-            # "Required checks successful"
+            # Checks successful
             pl.col("status_checks")
             .list.eval(pl.element().struct.field("conclusion") == "success")
             .list.all()
@@ -80,7 +80,7 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
             .alias("status_checks_passed"),
         ]
     ).with_columns(
-        # "both review and checks passed"
+        # both review and checks passed
         (pl.col("code_review_passed") & pl.col("status_checks_passed")).alias("is_compliant")
     )
 
@@ -117,11 +117,11 @@ def run_transform(input_path: str, output_dir: str = "data") -> str:
     transformed_df.write_parquet(parquet_path)
     logger.info(f"Transformed data saved to: {parquet_path}")
 
-    # Optional - Save as CSV
+    # Save as CSV
     csv_path = os.path.join(output_dir, f"transformed_{base_name}.csv")
     transformed_df.write_csv(csv_path)
 
-    # RETURN the path so the DAG can pass it to the 'Load' task
+    # RETURN the path so the DAG can pass it to the Load task
     return parquet_path
 
 

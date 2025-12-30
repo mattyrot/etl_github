@@ -33,7 +33,6 @@ class GitHubExtractor:
         self.semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
 
     async def _make_request(self, client: httpx.AsyncClient, endpoint: str, params: Optional[Dict] = None) -> Optional[Any]:
-        # ... (Same logic as before) ...
         url = f"{self.base_url}/{endpoint}"
         retries = 3
         backoff_factor = 2
@@ -67,7 +66,6 @@ class GitHubExtractor:
                 return None
 
     async def fetch_pr_metadata(self, client: httpx.AsyncClient, state: str = "closed", limit: int = 100) -> List[Dict]:
-        # ... (Same logic as before) ...
         prs = []
         page = 1
         per_page = 50
